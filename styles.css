@@ -8,11 +8,10 @@ body{
     place-content: center;
 }
 #canvasContainer{
+    display: inline-flex;
     box-sizing: content-box;
     align-self: center;
     position: relative;
-    width: 400px;
-    height: 600px;
     border: 25px solid #aca7a7;
     border-radius: 16px;
 }
