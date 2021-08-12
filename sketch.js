@@ -7,7 +7,7 @@ const arrayInclude = (matrix,arr2) => {
     return false
 }
 class Game{
-    constructor({width = 400, rows=5, columns=3, height = 600, mines=3}){
+    constructor({width = 400, rows=20, columns=20, height = 400, mines=36}){
         this.width = width
         this.height = height
         this.rows = rows
@@ -24,6 +24,9 @@ class Game{
         renderer.parent("canvasContainer");
     }
 
+    /**
+     * generates all the cells and show them graphically
+    */
     generateCells(){
         for(let row = 0; row<this.rows; row++){
             this.cells[row] = []
@@ -34,17 +37,25 @@ class Game{
         }
     }
 
+    /**
+     * generates all the mines
+     * @param {Number} row - the row of the cellClicked
+     * @param {Number} column - the column of the cellClicked
+    */
+
     insertMines(row, column){
         const cellClicked = [row, column]
         for(let mine = 0; mine<this.cantMines; mine++){
             this.mines[mine] = this.generateMine(cellClicked)
         }
         this.generateNumbers()
-
-        console.log("mines: ", this.mines)
-        console.log("cells: ", this.cells)
     }
 
+    /**
+     * assign the 💣 value to a random cell 
+     * @param {Cell} cellClicked - a cell object
+     * @return {[Number]} returns an array with the position of the new Mine
+    */
     generateMine(cellClicked){
         let randomRow = cellClicked[0]
         let randomCol = cellClicked[1]
@@ -53,45 +64,115 @@ class Game{
             randomCol = Math.floor(Math.random()*this.columns)
         }
         const newMine = [randomRow, randomCol]
-        this.cells[randomRow][randomCol].value = "*"
+        this.cells[randomRow][randomCol].value = "💣"
         return newMine
     }
 
+    /**
+     * assign the values of the cells around the mines
+     * 
+    */
     generateNumbers(){
-        for(let mine = 0; mine<this.cantMines; mine++){
-            let positionActual = this.mines[mine]
-            this.getCellsAround(positionActual).forEach(cellAround => {
-                if(cellAround[0] >= 0 && cellAround[0] < this.rows && cellAround[1] >= 0 && cellAround[1] < this.columns ){
-                    if(this.cells[cellAround[0]][cellAround[1]].value === 0){
-                        this.getCellsAround(cellAround).forEach(anotherCellAround => {
-                            if(anotherCellAround[0] >= 0 && anotherCellAround[0] < this.rows && anotherCellAround[1] >= 0 && anotherCellAround[1] < this.columns ){
-                                if(this.cells[anotherCellAround[0]][anotherCellAround[1]].value === "*"){
-                                    this.cells[cellAround[0]][cellAround[1]].value +=1
-                                }
-                            }
-                        })
-                    }
-                }
-            })
+        for(let mine = 0; mine<this.cantMines; mine ++){
+            let minePosition = this.mines[mine]
+            this.getCellsAroundAndDoInEachCell(minePosition, this.countMinesAround)
         }
     }
-    getCellsAround(positionActual){
-        const cellsAround = [[positionActual[0]-1,positionActual[1]-1],[positionActual[0]-1, positionActual[1]],[positionActual[0]-1, positionActual[1]+1],[positionActual[0], positionActual[1]+1],[positionActual[0]+1, positionActual[1]+1],[positionActual[0]+1, positionActual[1]],[positionActual[0]+1, positionActual[1]-1],[positionActual[0], positionActual[1]-1]]
+
+    /**
+     * displays a table-type log of the grid values ​​in the console
+     */
+    displayTableGrid = () =>{
+        const arr = []
+        this.cells.forEach(row =>{
+            let arr2 = [];
+            row.forEach(cell =>{
+                arr2.push(cell.value)
+            })
+            arr.push(arr2)
+        })
+    }
+
+    /**
+     * display all the grid visually
+     */
+    displayGrid = () =>{
+        this.cells.forEach(row =>{
+            row.forEach(cell => {cell.click()})
+        })
+    }
+
+    /**
+     * count the mines around the cell delivered as a param and assign them to the value property
+     * @param {Cell} cell - a Cell object
+     */
+    countMinesAround = (cell) =>{
+        if(cell.value === "💣") return
+        let minesAround = 0
+        const aroundMineCounter = (cell) =>{
+            if(cell.value === "💣") minesAround++
+        }
+        if(cell.value === 0 && cell.value != "💣"){
+            this.getCellsAroundAndDoInEachCell(cell.position, aroundMineCounter)
+            cell.value = minesAround
+        }    
+    }
+
+    /**
+     * get all the cells around and executes a function in each cell around the position
+     * @param {[Number]} position - The position of the the cell e.g. position = [row, column].
+     * @param {Function} fn - function thats executed in each cell around the position, receive as a param one cell around
+     * @return {[Cell]} returns an array with the cells around of the position
+     */
+    getCellsAroundAndDoInEachCell(position, fn){
+        const positionsToMove = [-1,0,1]
+        const cellsAround = []
+        positionsToMove.forEach(pos =>{
+            positionsToMove.forEach(pos2=>{
+                if(pos === 0 && pos2 === 0) return;
+                if (this.cells[position[0]+pos] && this.cells[position[0]+pos][position[1]+pos2]){
+                    const cellAround = this.cells[position[0]+pos][position[1]+pos2]
+                    cellsAround.push(cellAround)
+                    fn(cellAround)
+                }
+            })
+        })
         return cellsAround
     }
-    // suerte
+
     mouseClicked(){
         const row = Math.floor(mouseY / this.cellHeight)
         const column = Math.floor(mouseX / this.cellWidth)
         if(this.mines[0] === undefined) this.insertMines(row, column)
-        
-        this.cells[row][column].click()
+        let cellSelected = this.cells[row][column]
+        cellSelected.click()
+        if(cellSelected.value === 0) this.displayArroundAllZeros(cellSelected)
+    }
+
+    /**
+     * get all the cells around and executes a function in each cell around the position
+     * @param {[Number]} position - The position of the the cell e.g. position = [row, column].
+     * @param {Function} fn - function thats executed in each cell around the position, receive as a param one cell around
+     * @return {[Cell]} returns an array with the cells around of the position
+     */
+    displayArroundAllZeros = (cellSelected) =>{
+        const zerosCell = [cellSelected]
+        const clickAround = (cell) =>{
+            if(cell.value === 0 && !zerosCell.includes(cell)) zerosCell.push(cell)
+            cell.click()
+        }
+        for(let cell of zerosCell){
+            this.getCellsAroundAndDoInEachCell(cell.position, clickAround)
+        }
     }
 }
 class Cell{
     constructor({column, row, height, width}){
         this.x = column * width
         this.y = row * height
+        this.position = [row, column]
+        this.column = column
+        this.row = row
         this.height = height
         this.width = width
         this.value = 0
@@ -100,15 +181,49 @@ class Cell{
         rect(this.x,this.y, this.width, this.height)
     }
     click(){
-        fill(51)
-        rect(this.x,this.y, this.width, this.height)
+        textSize(this.width);
+        textAlign(CENTER, CENTER)
+        switch (this.value) {
+            case 1:
+                fill(0, 0, 100) 
+                break;
+            case 2:
+                fill(0, 100, 0) 
+                break;
+            case 3:
+                fill(100 ,0, 0) 
+                break;
+            case 4:
+                fill(0, 100, 100) 
+                break;
+            case 5:
+                fill(100 , 100, 0) 
+                break;
+            case 6:
+                fill(100 , 0, 100) 
+                break;
+            case 7:
+                fill(0, 0, 200) 
+                break;
+            case 8:
+                fill(200 , 0, 200) 
+                break;
+            case '💣':
+                fill(0,0,0)
+                break;
+            case 0:
+                fill(172, 167, 167);
+                rect(this.x,this.y, this.width, this.height)
+                break;
+            default:
+                fill(255 , 255, 255) 
+                break;
+        }
+        text(this.value.toString(), this.x + this.width/2, this.y + this.height/2);
     }
 }
 //setup
-const $canvasContainer = $('#canvasContainer')
-const sketchWidth = $canvasContainer.clientWidth;
-const sketchHeight = $canvasContainer.clientHeight;
-const game = new Game({width: sketchWidth, height: sketchHeight})
+const game = new Game({width: 500, height: 500})
 
 function setup() {
     game.createCanvas()
@@ -117,8 +232,6 @@ function setup() {
 }
   
 function draw() {
-    // background(340);
-    // ellipse(50,50,80,80);
 }
 function mouseClicked(e) {
     game.mouseClicked()
