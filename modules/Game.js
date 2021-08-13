@@ -20,7 +20,7 @@ class Game{
 
     setupConnection = () =>{
         if(this.coop){
-            this.ws = new WebSocket("wss://100.74.69.98:8084")
+            this.ws = new WebSocket("wss://minesweeper.thiagocpu.repl.co/index.js:3000")
             this.ws.addEventListener("message", ({data}) => {
                 const json = JSON.parse(data)
                 if(json.type === "click"){
