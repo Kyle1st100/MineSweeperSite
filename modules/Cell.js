@@ -15,11 +15,11 @@ class Cell{
         fill(255,255,255)
         rect(this.x,this.y, this.width, this.height)
     }
-    click(){
-        if(this.isFlagged || mouseButton === "right"){
+    click(mouseClicked){
+        if(this.isFlagged || mouseClicked === "right"){
             this.toggleFlag()
         } else {
-            if(mouseButton === "left"){
+            if(mouseClicked === "left"){
                 this.showValue()
             }
         }

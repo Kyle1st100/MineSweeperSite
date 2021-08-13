@@ -1,64 +1,42 @@
-
-@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
-
+@import url('https://fonts.googleapis.com/css2?family=Titan+One&display=swap');
 html,body{
     height: 100vh;
 }
-
 body{
     background: #626262;
     display: flex;
+    flex-direction: column;
     place-content: center;
 }
-#canvasContainer{
-    display: inline-flex;
-    box-sizing: content-box;
+.menuContainer{
+    justify-content: space-evenly;
+    height: 400px;
+    display: flex;
     align-self: center;
-    position: relative;
-    border: 25px solid #aca7a7;
-    border-radius: 16px;
-}
-.start{
-    cursor: pointer;
-    text-align: center;
-    font-size: 25px;
-    display: flex;
-    position: absolute;
-    top: -50px;
-    left: calc(50% - 25px);
-    width: 50px;
-    height: 50px;
-    background-color: #aca7a7;
-    border-radius: 50%;
     flex-direction: column;
+}
+.menuContainer > .title{
+    font-size: 60px;
+    font-family: 'Titan One', cursive;
+    text-align: center;
+
+}
+.menuContainer > .menuOption{
+    align-self: center;
+    font-size: 40px;
+    border-radius: 40px;
+    width: 300px;
+    height: 75px;
+    display: flex;
     justify-content: center;
+    align-items: center;
+    background: rgb(172, 172, 33);
+    text-decoration: none;
+    color: black;
+    border: 1px solid black;
 }
-.start:active::after{
-    position: absolute;
-    left: 8px;
-    content: '😉';
-}
-.pointsContainer{
-    position: absolute;
-    display: flex;
-    justify-content: space-between;
-    color: rebeccapurple;
-    width: 100%;
-    height: 25px;
-    top: -25px;
-}
-.pointsContainer > *{
-    display: flex;
-    font-family: 'Press Start 2P', cursive;
-    text-align: end;
-    background-color: rgb(59, 53, 53);
-}
-.icon{
-    font-size: 20px;
-}
-.retro{
-    padding-top: 3px;
-    font-size: 1.4em;
+.menuContainer > .menuOption:hover{
+    background-color: rgb(212, 212, 62);
 }
 *{
     box-sizing: border-box;

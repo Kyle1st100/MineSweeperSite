@@ -4,28 +4,16 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-    <link rel="stylesheet" href="styles.css">
+    <title>Menu</title>
+    <link rel="stylesheet" href="./styles.css">
 </head>
 <body>
-    <div id="canvasContainer">
-        
-        <div class="pointsContainer">
-            <div class="points">
-                <span class="retro">1000</span>
-            </div>
-            
-            <div class="timer">
-                <span class="icon">⌛</span>
-                <span class="retro">0000</span>
-            </div>
-        </div>
-        <div class="start">😍</div>
+    
+    <div class="menuContainer">
+        <h1 class="title">MineSweeper</h1>
+        <a href="./singlePlayer/index.html" class="menuOption">Single Player</a>
+        <a href="./cooperative/index.html" class="menuOption">Cooperative</a>
+        <!-- <a href="./versus/index.html" class="menuOption">Versus</a> -->
     </div>
-    <script>
-        document.addEventListener('contextmenu', event => event.preventDefault());
-    </script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.min.js"></script>
-    <script type="module" src="sketch.js"></script>
 </body>
 </html>

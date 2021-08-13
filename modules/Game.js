@@ -1,6 +1,6 @@
 import {Cell} from "./Cell.js"
 class Game{
-    constructor({rows=20, columns=20, mines=36, $timer, $points}){
+    constructor({rows=20, columns=20, mines=36, $timer, $points, coop = false}){
         this.cellSize = 25;
         this.cellsRemaining = columns * rows - mines
         this.width = this.cellSize * columns
@@ -14,6 +14,34 @@ class Game{
         this.$timer = $timer;
         this.timerInterval;
         this.$points = $points;
+        this.coop = coop
+    }
+
+
+    setupConnection = () =>{
+        if(this.coop){
+            this.ws = new WebSocket("ws://100.74.69.98:8084")
+            this.ws.addEventListener("message", ({data}) => {
+                const json = JSON.parse(data)
+                if(json.type === "click"){
+                    console.log("click")
+                    const {cords, mouseClicked} = json
+                    const cell = this.cells[cords[0]][cords[1]]
+                    this.cellClicked(cell, mouseClicked)
+                }
+                if(json.type === "mines"){
+                    console.log("mines")
+                    const {positions} = json
+                    positions.forEach(pos => {
+                        this.cells[pos[0]][pos[1]].value = "💣"
+                        this.mines.push(this.cells[pos[0]][pos[1]])
+                    })
+                    this.startGame()
+                    this.generateNumbers()
+                }
+                if(json.type === "restart") this.restart()
+            })
+        }
     }
 
     handleWin = () => {
@@ -29,7 +57,7 @@ class Game{
             this.$timer.innerText = time++
             this.$points.innerText -= 15
         }, 1000);
-        this.insertMines(cellSelected)   
+        if(this.mines[0] === undefined) this.insertMines(cellSelected)   
     }
 
     gameWin = () => {
@@ -42,7 +70,11 @@ class Game{
         this.$points.innerText = 0;
         this.cnv.mouseReleased(()=>{})
     }
-
+    sendRestart = () =>{
+        if(this.coop){
+            this.ws.send(JSON.stringify({type: "restart"}))
+        }
+    }
     restart = () =>{
         clearInterval(this.timerInterval)
         this.$timer.innerText = 0;
@@ -73,8 +105,13 @@ class Game{
     */
 
     insertMines(cellSelected){
+        const positions = []
         for(let mine = 0; mine<this.cantMines; mine++){
             this.mines[mine] = this.generateMine(cellSelected)
+            positions.push(this.mines[mine].position)
+        }
+        if(this.coop) {
+            this.ws.send(JSON.stringify({type: "mines", positions}))
         }
         this.generateNumbers()
     }
@@ -145,22 +182,35 @@ class Game{
         return cellsAround
     }
 
+    sendCellClickedToServer = (cords) => {
+        if(this.coop){
+            this.ws.send(JSON.stringify({type: "click", cords, mouseClicked: mouseButton}))
+        }
+    }
+ 
     /**
      * handle the mousereleased event
      */
     mouseReleased = (e) =>{
         const row = Math.floor(mouseY / this.cellSize)
         const column = Math.floor(mouseX / this.cellSize)
-        let cellSelected = this.cells[row][column] 
+        let cellSelected = this.cells[row][column]
         if(mouseButton === "left" && !cellSelected.isFlagged){
             if(this.mines[0] === undefined) this.startGame(cellSelected)
-            if(cellSelected.value === 0) this.displayArroundAllZeros(cellSelected)
-            if(cellSelected.value === "💣") this.gameOver()
-            if(!cellSelected.showed && cellSelected.value !== "💣") {
+        }
+        this.sendCellClickedToServer(cellSelected.position) 
+        this.cellClicked(cellSelected, mouseButton)
+
+    }
+    cellClicked = (cell, mouseClicked) => {
+        if(mouseClicked === "left" && !cell.isFlagged){
+            if(cell.value === 0) this.displayArroundAllZeros(cell)
+            if(cell.value === "💣") this.gameOver()
+            if(!cell.showed && cell.value !== "💣") {
                 this.cellsRemaining--
                 this.handleWin()
         }}
-        cellSelected.click()
+        cell.click(mouseClicked)
     }
 
     displayCanvas(){
@@ -214,7 +264,7 @@ class Game{
      */
     displayGrid = () =>{
         this.cells.forEach(row =>{
-            row.forEach(cell => {cell.click()})
+            row.forEach(cell => {cell.showValue()})
         })
     }
 }
