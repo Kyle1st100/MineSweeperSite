@@ -21,6 +21,9 @@ class Game{
     setupConnection = () =>{
         if(this.coop){
             this.ws = new WebSocket("wss://minesweeper.thiagocpu.repl.co/index.js:3000")
+            this.ws.addEventListener("open", ()=>{
+                this.cnv.mouseReleased(this.mouseReleased)
+            })
             this.ws.addEventListener("message", ({data}) => {
                 const json = JSON.parse(data)
                 if(json.type === "click"){
@@ -216,7 +219,7 @@ class Game{
     displayCanvas(){
         this.cnv = createCanvas(this.width, this.height);
         this.cnv.parent("canvasContainer");
-        this.cnv.mouseReleased(this.mouseReleased)
+        if(!this.coop)this.cnv.mouseReleased(this.mouseReleased)
     }
 
     displayFlags = () => {
