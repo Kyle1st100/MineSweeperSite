@@ -42,6 +42,7 @@ body{
     position: absolute;
     display: flex;
     justify-content: space-between;
+    color: rebeccapurple;
     width: 100%;
     height: 25px;
     top: -25px;

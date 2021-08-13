@@ -2,6 +2,7 @@ import {Cell} from "./Cell.js"
 class Game{
     constructor({rows=20, columns=20, mines=36, $timer, $points}){
         this.cellSize = 25;
+        this.cellsRemaining = columns * rows - mines
         this.width = this.cellSize * columns
         this.height = this.cellSize * rows
         this.rows = rows
@@ -15,30 +16,42 @@ class Game{
         this.$points = $points;
     }
 
+    handleWin = () => {
+        if(!this.cellsRemaining){
+            this.gameWin()
+            this.displayFlags()
+        }
+    }
 
     startGame = (cellSelected) =>{
         let time = 1
         this.timerInterval = setInterval(()=>{
             this.$timer.innerText = time++
+            this.$points.innerText -= 15
         }, 1000);
-        this.insertMines(cellSelected)
-        
+        this.insertMines(cellSelected)   
     }
-    gameOver = () =>{
+
+    gameWin = () => {
         clearInterval(this.timerInterval)
         this.cnv.mouseReleased(()=>{})
     }
+
+    gameOver = () =>{
+        clearInterval(this.timerInterval)
+        this.$points.innerText = 0;
+        this.cnv.mouseReleased(()=>{})
+    }
+
     restart = () =>{
+        clearInterval(this.timerInterval)
+        this.$timer.innerText = 0;
+        this.$points.innerText = 1000
+        this.cellsRemaining = this.rows * this.columns - this.cantMines
         this.cells = []
         this.mines = []
         this.cnv.mouseReleased(this.mouseReleased)
         this.generateCells()
-    }
-
-    createCanvas(){
-        this.cnv = createCanvas(this.width, this.height);
-        this.cnv.parent("canvasContainer");
-        this.cnv.mouseReleased(this.mouseReleased)
     }
 
     /**
@@ -143,10 +156,25 @@ class Game{
             if(this.mines[0] === undefined) this.startGame(cellSelected)
             if(cellSelected.value === 0) this.displayArroundAllZeros(cellSelected)
             if(cellSelected.value === "💣") this.gameOver()
-        }
+            if(!cellSelected.showed && cellSelected.value !== "💣") {
+                this.cellsRemaining--
+                this.handleWin()
+        }}
         cellSelected.click()
     }
 
+    displayCanvas(){
+        this.cnv = createCanvas(this.width, this.height);
+        this.cnv.parent("canvasContainer");
+        this.cnv.mouseReleased(this.mouseReleased)
+    }
+
+    displayFlags = () => {
+        this.mines.forEach(mine => {
+            mine.value = "🚩"
+            mine.showValue()
+        })
+    }
     /**
      * get all the cells around and executes a function in each cell around the position
      * @param {[Number]} position - The position of the the cell e.g. position = [row, column].
@@ -156,8 +184,12 @@ class Game{
     displayArroundAllZeros = (cellSelected) =>{
         const zerosCell = [cellSelected]
         const showValueAround = (cell) =>{
-            if(cell.value === 0 && !cell.showed) zerosCell.push(cell)
-            cell.showValue()
+            if(!cell.showed){
+                if(cell.value === 0)zerosCell.push(cell)
+                cell.showValue()
+                this.cellsRemaining--
+                this.handleWin()
+            }
         }
         for(let cell of zerosCell){
             this.getCellsAroundAndDoInEachCell(cell.position, showValueAround)

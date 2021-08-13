@@ -7,7 +7,7 @@ const $points = $('.points > .retro')
 const game = new Game({ $timer, $points})
 
 window.setup = () => {
-    game.createCanvas()
+    game.displayCanvas()
     game.generateCells()
     $('.start').onclick = () =>{
         game.restart()

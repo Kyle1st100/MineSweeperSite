@@ -16,17 +16,17 @@ class Cell{
         rect(this.x,this.y, this.width, this.height)
     }
     click(){
-        if(this.isFlagged || mouseButton === "right" && this.showed === false){
-            this.alternateFlag()
+        if(this.isFlagged || mouseButton === "right"){
+            this.toggleFlag()
         } else {
-            if(mouseButton === "left" && this.showed === false){
-                console.log("hola")
+            if(mouseButton === "left"){
                 this.showValue()
             }
         }
     }
     
-    alternateFlag = () =>{
+    toggleFlag = () =>{
+        if(this.showed) return
         this.isFlagged = !this.isFlagged
         if(this.isFlagged){
             textSize(this.width/1.3);
@@ -38,10 +38,15 @@ class Cell{
         
     }
     showValue = () => {
+        if(this.showed) return
         this.showed = true
         textSize(this.width);
         textAlign(CENTER, CENTER)
-        switch (this.value) {
+        switch (this.value) {     
+            case 0:
+                fill(172, 167, 167);
+                rect(this.x,this.y, this.width, this.height)
+                break;
             case 1:
                 fill(0, 0, 100) 
                 break;
@@ -70,9 +75,8 @@ class Cell{
                 fill(255,0,0)
                 rect(this.x,this.y, this.width, this.height)
                 break;
-            case 0:
-                fill(172, 167, 167);
-                rect(this.x,this.y, this.width, this.height)
+            case '🚩':
+                textSize(this.width/1.3);
                 break;
             default:
                 fill(255 , 255, 255) 
