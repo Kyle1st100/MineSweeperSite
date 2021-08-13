@@ -9,9 +9,23 @@
 </head>
 <body>
     <div id="canvasContainer">
+        
+        <div class="pointsContainer">
+            <div class="points">
+                <span class="retro">0000</span>
+            </div>
+            
+            <div class="timer">
+                <span class="icon">⌛</span>
+                <span class="retro">0000</span>
+            </div>
+        </div>
         <div class="start">😍</div>
     </div>
+    <script>
+        document.addEventListener('contextmenu', event => event.preventDefault());
+    </script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.min.js"></script>
-    <script src="sketch.js"></script>
+    <script type="module" src="sketch.js"></script>
 </body>
 </html>
