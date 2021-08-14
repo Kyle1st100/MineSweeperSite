@@ -42,6 +42,10 @@ class Game{
                     this.startGame()
                     this.generateNumbers()
                 }
+                if(json.type === "points"){
+                    this.$timer.innerText = json.data
+                    this.$points.innerText = 1000 - 15 * json.data 
+                }
                 if(json.type === "restart") this.restart()
             })
         }
@@ -55,9 +59,8 @@ class Game{
     }
 
     startGame = (cellSelected) =>{
-        let time = 1
         this.timerInterval = setInterval(()=>{
-            this.$timer.innerText = time++
+            this.$timer.innerText = +this.$timer.innerText + 1
             this.$points.innerText -= 15
         }, 1000);
         if(this.mines[0] === undefined) this.insertMines(cellSelected)   
