@@ -240,7 +240,7 @@ class Game{
     displayArroundAllZeros = (cellSelected) =>{
         const zerosCell = [cellSelected]
         const showValueAround = (cell) =>{
-            if(!cell.showed){
+            if(!cell.showed && !cell.isFlagged){
                 if(cell.value === 0)zerosCell.push(cell)
                 cell.showValue()
                 this.cellsRemaining--
