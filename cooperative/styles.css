@@ -20,7 +20,7 @@ body{
 }
 .start{
     cursor: pointer;
-    text-align: center;
+    align-items: center;
     font-size: 25px;
     display: flex;
     position: absolute;
@@ -33,7 +33,7 @@ body{
     flex-direction: column;
     justify-content: center;
 }
-.start:active::after{
+.startActive:active::after{
     position: absolute;
     left: 8px;
     content: '😉';
