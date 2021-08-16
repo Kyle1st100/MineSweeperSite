@@ -1,6 +1,6 @@
 import {Cell} from "./Cell.js"
 class Game{
-    constructor({rows=20, columns=20, mines=36, $timer, $points, coop = false}){
+    constructor({rows=20, columns=20, mines=36, $timer, $points, $emoji, coop = false}){
         this.cellSize = 25;
         this.cellsRemaining = columns * rows - mines
         this.width = this.cellSize * columns
@@ -11,6 +11,7 @@ class Game{
         this.mines = []
         this.cantMines = mines
         this.cnv;
+        this.$emoji = $emoji
         this.$timer = $timer;
         this.timerInterval;
         this.$points = $points;
@@ -73,6 +74,10 @@ class Game{
 
     gameOver = () =>{
         clearInterval(this.timerInterval)
+        this.$emoji.innerHTML = `
+        <img src="../public/loseEmoji.png" width="40px">
+        `
+        this.$emoji.classList.remove("startActive")
         this.$points.innerText = 0;
         this.cnv.mouseReleased(()=>{})
     }
@@ -85,6 +90,8 @@ class Game{
         clearInterval(this.timerInterval)
         this.$timer.innerText = 0;
         this.$points.innerText = 1000
+        this.$emoji.innerHTML = '😍'
+        this.$emoji.classList.add("startActive")
         this.cellsRemaining = this.rows * this.columns - this.cantMines
         this.cells = []
         this.mines = []
